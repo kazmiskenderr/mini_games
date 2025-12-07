@@ -1,0 +1,18 @@
+flutter_launcher_icons:
+  image_path: assets/icons/multi_games_icon.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  macos:
+    generate: true
+    image_path: assets/icons/multi_games_icon.png
+  windows:
+    generate: true
+    image_path: assets/icons/multi_games_icon.png
+  linux:
+    generate: true
+    image_path: assets/icons/multi_games_icon.png
+  web:
+    generate: true
+    image_path: assets/icons/multi_games_icon.png
+    background_color: "#0B0E1E"

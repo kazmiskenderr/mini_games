@@ -3,8 +3,10 @@ import '../screens/pro_home_screen.dart';
 import '../games/jump_game/pro_jump_game_screen.dart';
 import '../games/jump_game/game_preview_screen.dart';
 import '../games/jump_game/services/game_settings.dart';
-import '../games/dart_game/dart_game_screen.dart';
+import '../games/dart_game/dart_game_mode.dart';
+import '../games/dart_game/modern_dart_screen.dart';
 import '../games/dart_game/dart_game_preview_screen.dart';
+import '../games/ludo/ui/ludo_home_screen.dart';
 
 class GameRoutes {
   static const String home = '/';
@@ -13,6 +15,7 @@ class GameRoutes {
   static const String snakeGame = '/snake-game';
   static const String dartGame = '/dart-game';
   static const String dartGamePreview = '/dart-game-preview';
+  static const String ludoHome = '/ludo-home';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,7 +43,7 @@ class GameRoutes {
         final mode = settings.arguments as DartGameMode? ?? DartGameMode.practice;
         return PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => 
-              DartGameScreen(mode: mode),
+              ModernDartScreen(mode: mode),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
               opacity: animation,
@@ -89,6 +92,23 @@ class GameRoutes {
             );
           },
           transitionDuration: const Duration(milliseconds: 400),
+        );
+      case ludoHome:
+        return PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => 
+              const LudoHomeScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+                ),
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 350),
         );
       default:
         return MaterialPageRoute(

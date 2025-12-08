@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'dart_game_screen.dart';
+import 'modern_dart_screen.dart';
+import 'dart_game_mode.dart';
 
 /// Dart oyunu mod seçim ekranı
 class DartGamePreviewScreen extends StatelessWidget {
@@ -259,7 +260,7 @@ class DartGamePreviewScreen extends StatelessWidget {
   void _startGame(BuildContext context, DartGameMode mode) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => DartGameScreen(mode: mode),
+        builder: (context) => ModernDartScreen(mode: mode),
       ),
     );
   }

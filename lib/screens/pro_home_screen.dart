@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../router/game_router.dart';
+import '../router/color_routes.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,13 +61,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final games = [
       GameInfo(
+        title: 'Color Tube Sort',
+        description: 'Renkleri sırala, rahatla!',
+        icon: Icons.science_rounded,
+        colors: [const Color(0xFF6C63FF), const Color(0xFF7DD3FC)],
+        route: ColorRoutes.colorTubeMenu,
+        isAvailable: true,
+        imageAsset: 'tube',
+      ),
+      GameInfo(
         title: 'Zıpla & Koş',
         description: 'Engelleri aş, rekor kır!',
         icon: Icons.rocket_launch_rounded,
         colors: [const Color(0xFF667eea), const Color(0xFF764ba2)],
         route: GameRoutes.jumpGamePreview,
         isAvailable: true,
-        imageAsset: 'jump', // Özel görsel için
+        imageAsset: 'jump',
       ),
       GameInfo(
         title: 'Dart',
@@ -76,6 +86,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         route: GameRoutes.dartGamePreview,
         isAvailable: true,
         imageAsset: 'dart',
+      ),
+      GameInfo(
+        title: 'Kızma Birader',
+        description: 'Klasik Ludo macerası!',
+        icon: Icons.casino_rounded,
+        colors: [const Color(0xFFf093fb), const Color(0xFFf5576c)],
+        route: GameRoutes.ludoHome,
+        isAvailable: true,
+        imageAsset: 'ludo',
       ),
       GameInfo(
         title: 'Yılan Oyunu',

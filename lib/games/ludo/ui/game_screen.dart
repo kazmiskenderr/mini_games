@@ -69,7 +69,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     _rotationZ = Tween<double>(begin: 0, end: _targetRotZ).animate(
       CurvedAnimation(parent: _diceController, curve: Curves.easeInOut)
     );
-    _scaleAnim = Tween<double>(begin: 1.0, end: 1.15).animate(
+    // Disable scale animation during roll so dice do not grow/shrink
+    _scaleAnim = Tween<double>(begin: 1.0, end: 1.0).animate(
       CurvedAnimation(parent: _diceController, curve: Curves.easeInOut)
     );
     _diceController.forward(from: 0);
@@ -136,42 +137,77 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               ),
             ),
             Expanded(
-              child: Stack(
-                children: [
-                  // Oyun tahtası
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Center(
-                      child: AspectRatio(
-                        aspectRatio: 1,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final availW = constraints.maxWidth;
+                  final availH = constraints.maxHeight;
+                  // Zar boyutu (aynı görselde kullanılıyor)
+                  const dieSize = 62.0;
+                  const spacing = 12.0; // zar ile tahta arasındaki boşluk
+
+                  // Yatayda tahta için maksimum genişlik (kenarlarda biraz padding bırak)
+                  final maxBoardByWidth = availW - 16.0;
+
+                  // Tahtayı dikeyde mümkün olduğunca büyüt; ama ekranın daha alt kısmına kaydırarak
+                  // alt bölgeyi genişletiyoruz (kullanıcı isteğine göre aşağı doğru büyüyecek).
+                  final boardSize = math.min(maxBoardByWidth, availH * 0.88).clamp(0.0, availH);
+
+                  // Ortalanmış yatay pozisyon
+                  final boardX = (availW - boardSize) / 2;
+
+                  // Üst zar yatayda ortada; dikeyde tahtanın üst kenarına daha yakın olacak şekilde
+                  final topDieLeft = boardX + (boardSize - dieSize) / 2;
+                  // Aşağı doğru daha fazla yer bırakmak için tahtayı orta-alt konuma taşıyoruz
+                  final boardTop = (availH - boardSize) * 0.42;
+                  // Üst zar tahtaya biraz daha uzakta görünsün (daha fazla boşluk)
+                  final topDieTop = boardTop - dieSize - spacing;
+
+                  // Alt zar konumu: tahtanın hemen altında, biraz daha uzak olacak şekilde
+                  final bottomDieLeft = topDieLeft;
+                  final bottomDieTop = boardTop + boardSize + spacing;
+
+                  return Stack(
+                    children: [
+                      // Tahta
+                      Positioned(
+                        left: boardX,
+                        top: boardTop,
+                        width: boardSize,
+                        height: boardSize,
                         child: CustomPaint(
                           painter: LudoBoardRenderer(),
                           size: Size.infinite,
                         ),
                       ),
-                    ),
-                  ),
-                  // Sol alt zar (Oyuncu)
-                  Positioned(
-                    left: 16,
-                    bottom: 56, // bir tık yukarı
-                    child: _buildDiceArea(
-                      isPlayer: true,
-                      value: _playerDiceValue,
-                      isActive: _isPlayerTurn,
-                    ),
-                  ),
-                  // Sağ üst zar (Bot)
-                  Positioned(
-                    right: 16,
-                    top: 56, // bir tık aşağı
-                    child: _buildDiceArea(
-                      isPlayer: false,
-                      value: _botDiceValue,
-                      isActive: !_isPlayerTurn,
-                    ),
-                  ),
-                ],
+
+                      // Üst zar (bot için)
+                      Positioned(
+                        left: topDieLeft,
+                        top: topDieTop,
+                        width: dieSize,
+                        height: dieSize,
+                        child: _buildDiceArea(
+                          isPlayer: false,
+                          value: _botDiceValue,
+                          isActive: !_isPlayerTurn,
+                        ),
+                      ),
+
+                      // Alt zar (player için)
+                      Positioned(
+                        left: bottomDieLeft,
+                        top: bottomDieTop,
+                        width: dieSize,
+                        height: dieSize,
+                        child: _buildDiceArea(
+                          isPlayer: true,
+                          value: _playerDiceValue,
+                          isActive: _isPlayerTurn,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],

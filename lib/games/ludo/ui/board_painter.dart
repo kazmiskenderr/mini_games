@@ -11,7 +11,9 @@ class BoardPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final boardSize = size.width * 0.9;
+    // Tahtayı mümkün olan en büyük kare alana sığdırmak için
+    // genişlik ve yükseklikten en küçüğünü alıyoruz.
+    final boardSize = math.min(size.width, size.height) * 0.92;
     final boardX = (size.width - boardSize) / 2;
     final boardY = (size.height - boardSize) / 2;
     final cellSize = boardSize / 4;

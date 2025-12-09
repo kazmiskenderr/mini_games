@@ -70,7 +70,8 @@ class _Dice3DCubeState extends State<Dice3DCube> with SingleTickerProviderStateM
     final endRy = target[1] + extraY;
     final endRz = target[2] + extraZ;
 
-    _ctrl.duration = const Duration(milliseconds: 800 + 200);
+    // make the spin faster: halve the previous duration for ~2x speed
+    _ctrl.duration = const Duration(milliseconds: 500);
     _ctrl.reset();
 
     // animate by updating rx/ry/rz each frame based on _anim.value

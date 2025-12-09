@@ -38,6 +38,7 @@ dependencies:
   shared_preferences: ^2.2.2
   google_fonts: ^6.1.0
   audioplayers: ^6.0.0
+  flutter_svg: ^1.1.6
 
 dev_dependencies:
   flutter_test:
@@ -85,6 +86,12 @@ flutter:
   assets:
     - assets/icons/multi_games_icon.png
     - assets/icons/dart_icon.png
+    - assets/dice/face_1.svg
+    - assets/dice/face_2.svg
+    - assets/dice/face_3.svg
+    - assets/dice/face_4.svg
+    - assets/dice/face_5.svg
+    - assets/dice/face_6.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

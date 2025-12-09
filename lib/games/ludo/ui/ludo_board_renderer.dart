@@ -47,14 +47,14 @@ class LudoBoardRenderer extends CustomPainter {
     final radius = Radius.circular(size * 0.15);
     canvas.drawRRect(
       RRect.fromRectAndRadius(Rect.fromLTWH(x, y, size, size), radius),
-      Paint()..color = color.withValues(alpha: 0.4),
+      Paint()..color = color.withOpacity(0.95),
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(Rect.fromLTWH(x, y, size, size), radius),
       Paint()
         ..color = white
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+        ..strokeWidth = 2.8,
     );
   }
 
@@ -62,7 +62,7 @@ class LudoBoardRenderer extends CustomPainter {
     final gridPaint = Paint()
       ..color = grid
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
+      ..strokeWidth = 2.6;
 
     for (int row = 6; row <= 8; row++) {
       for (int col = 0; col <= 5; col++) {
@@ -92,7 +92,7 @@ class LudoBoardRenderer extends CustomPainter {
     final gridPaint = Paint()
       ..color = grid
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
+      ..strokeWidth = 2.6;
 
     // Sarı ev yolu - soldan merkeze doğru (satır 7, sütun 1-5)
     for (int i = 1; i <= 5; i++) {
@@ -188,6 +188,14 @@ class LudoBoardRenderer extends CustomPainter {
       points.add(Offset(center.dx + r * math.cos(angle), center.dy + r * math.sin(angle)));
     }
     canvas.drawPath(Path()..addPolygon(points, true), Paint()..color = const Color(0xFFFFB800));
+    // add thin dark stroke to star for clarity
+    canvas.drawPath(
+      Path()..addPolygon(points, true),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..color = Colors.black.withOpacity(0.55)
+        ..strokeWidth = 1.4,
+    );
   }
 
   void _drawHomePawns(Canvas canvas, double c) {
@@ -213,53 +221,125 @@ class LudoBoardRenderer extends CustomPainter {
   }
 
   void _drawPawn(Canvas canvas, double x, double y, double size, Color color) {
-    final darkColor = Color.lerp(color, Colors.black, 0.3)!;
+    final darkColor = Color.lerp(color, Colors.black, 0.45)!;
+    final darkerColor = Color.lerp(color, Colors.black, 0.6)!;
+    final lightColor = Color.lerp(color, Colors.white, 0.35)!;
+    final lighterColor = Color.lerp(color, Colors.white, 0.6)!;
     
-    // Gölge
-    final shadowPath = Path()
-      ..moveTo(x - size * 0.5 + 2, y + size * 0.6 + 2)
-      ..lineTo(x + size * 0.5 + 2, y + size * 0.6 + 2)
-      ..quadraticBezierTo(x + size * 0.3 + 2, y + size * 0.3 + 2, x + size * 0.25 + 2, y + 2)
-      ..quadraticBezierTo(x + size * 0.4 + 2, y - size * 0.3 + 2, x + size * 0.2 + 2, y - size * 0.5 + 2)
-      ..arcToPoint(
-        Offset(x - size * 0.2 + 2, y - size * 0.5 + 2),
-        radius: Radius.circular(size * 0.25),
-        clockwise: true,
-      )
-      ..quadraticBezierTo(x - size * 0.4 + 2, y - size * 0.3 + 2, x - size * 0.25 + 2, y + 2)
-      ..quadraticBezierTo(x - size * 0.3 + 2, y + size * 0.3 + 2, x - size * 0.5 + 2, y + size * 0.6 + 2)
-      ..close();
-    canvas.drawPath(shadowPath, Paint()..color = Colors.black.withValues(alpha: 0.4));
-
-    // Piyon gövdesi
-    final pawnPath = Path()
-      ..moveTo(x - size * 0.5, y + size * 0.6)
-      ..lineTo(x + size * 0.5, y + size * 0.6)
-      ..quadraticBezierTo(x + size * 0.3, y + size * 0.3, x + size * 0.25, y)
-      ..quadraticBezierTo(x + size * 0.4, y - size * 0.3, x + size * 0.2, y - size * 0.5)
-      ..arcToPoint(
-        Offset(x - size * 0.2, y - size * 0.5),
-        radius: Radius.circular(size * 0.25),
-        clockwise: true,
-      )
-      ..quadraticBezierTo(x - size * 0.4, y - size * 0.3, x - size * 0.25, y)
-      ..quadraticBezierTo(x - size * 0.3, y + size * 0.3, x - size * 0.5, y + size * 0.6)
-      ..close();
-
-    canvas.drawPath(pawnPath, Paint()..color = color);
-    canvas.drawPath(
-      pawnPath,
+    // === GÖLGE === (daha dolgun, daha az transparan)
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(x + size * 0.18, y + size * 0.45),
+        width: size * 0.9,
+        height: size * 0.36,
+      ),
       Paint()
-        ..color = Colors.black
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
+        ..color = Colors.black.withOpacity(0.68)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0),
     );
 
-    // Üst parlama
+    // === ANA GÖVDE (büyük küre) ===
+    final bodyRadius = size * 0.52;
+    final bodyY = y + size * 0.1;
+
+    // Gövde base
+    canvas.drawCircle(Offset(x, bodyY), bodyRadius, Paint()..color = darkerColor);
+
+    // Gövde 3D gradient (daha kontrastlı)
+    final bodyGradient = RadialGradient(
+      center: const Alignment(-0.5, -0.6),
+      radius: 0.95,
+      colors: [lighterColor, lightColor, color, darkColor, darkerColor],
+      stops: const [0.0, 0.12, 0.36, 0.78, 1.0],
+    );
     canvas.drawCircle(
-      Offset(x - size * 0.05, y - size * 0.45),
-      size * 0.12,
-      Paint()..color = Colors.white.withValues(alpha: 0.5),
+      Offset(x, bodyY),
+      bodyRadius,
+      Paint()..shader = bodyGradient.createShader(
+        Rect.fromCircle(center: Offset(x, bodyY), radius: bodyRadius),
+      ),
+    );
+
+    // Gövde kontur (daha belirgin)
+    canvas.drawCircle(
+      Offset(x, bodyY),
+      bodyRadius,
+      Paint()
+        ..color = darkerColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.2,
+    );
+
+    // === KAFA (küçük küre - gövdenin üstünde) ===
+    final headRadius = size * 0.35;
+    final headY = y - size * 0.28;
+
+    // Kafa base
+    canvas.drawCircle(Offset(x, headY), headRadius, Paint()..color = darkerColor);
+
+    // Kafa 3D gradient
+    final headGradient = RadialGradient(
+      center: const Alignment(-0.5, -0.5),
+      radius: 0.95,
+      colors: [lighterColor, lightColor, color, darkColor, darkerColor],
+      stops: const [0.0, 0.14, 0.38, 0.82, 1.0],
+    );
+    canvas.drawCircle(
+      Offset(x, headY),
+      headRadius,
+      Paint()..shader = headGradient.createShader(
+        Rect.fromCircle(center: Offset(x, headY), radius: headRadius),
+      ),
+    );
+
+    // Kafa kontur (daha belirgin)
+    canvas.drawCircle(
+      Offset(x, headY),
+      headRadius,
+      Paint()
+        ..color = darkerColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.8,
+    );
+
+    // === PARLAMA EFEKTLERİ === (daha net)
+
+    // Kafa parlama (büyük)
+    final headHighlight = RadialGradient(
+      colors: [Colors.white.withOpacity(0.95), Colors.white.withOpacity(0.0)],
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(x - headRadius * 0.35, headY - headRadius * 0.35),
+        width: headRadius * 0.7,
+        height: headRadius * 0.45,
+      ),
+      Paint()..shader = headHighlight.createShader(
+        Rect.fromCenter(
+          center: Offset(x - headRadius * 0.35, headY - headRadius * 0.35),
+          width: headRadius * 0.7,
+          height: headRadius * 0.45,
+        ),
+      ),
+    );
+
+    // Gövde parlama (büyük)
+    final bodyHighlight = RadialGradient(
+      colors: [Colors.white.withOpacity(0.85), Colors.white.withOpacity(0.0)],
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(x - bodyRadius * 0.4, bodyY - bodyRadius * 0.4),
+        width: bodyRadius * 0.7,
+        height: bodyRadius * 0.45,
+      ),
+      Paint()..shader = bodyHighlight.createShader(
+        Rect.fromCenter(
+          center: Offset(x - bodyRadius * 0.4, bodyY - bodyRadius * 0.4),
+          width: bodyRadius * 0.7,
+          height: bodyRadius * 0.45,
+        ),
+      ),
     );
   }
 
@@ -269,7 +349,7 @@ class LudoBoardRenderer extends CustomPainter {
       Paint()
         ..color = grid
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5,
+        ..strokeWidth = 3.4,
     );
   }
 
